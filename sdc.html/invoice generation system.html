@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice Generation System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 0;
+        }
+
+        .form-container, .invoice-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+        }
+
+        h2 {
+            text-align: center;
+        }
+
+        label {
+            display: block;
+            margin-top: 10px;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button {
+            margin-top: 20px;
+            padding: 10px 15px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #218838;
+        }
+
+        .invoice {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #000;
+            background-color: white;
+        }
+
+        .invoice-header {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .invoice-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .invoice-table th, .invoice-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        .invoice-table th {
+            background-color: #f4f4f4;
+        }
+
+        .total {
+            text-align: right;
+            margin-top: 15px;
+            font-size: 1.2em;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <h2>Invoice Data Input</h2>
+        <form id="invoiceForm">
+            <label for="customerName">Customer Name</label>
+            <input type="text" id="customerName" required>
+
+            <label for="customerAddress">Customer Address</label>
+            <textarea id="customerAddress" required></textarea>
+
+            <label for="itemDescription">Item Description</label>
+            <input type="text" id="itemDescription" required>
+
+            <label for="quantity">Quantity</label>
+            <input type="number" id="quantity" required>
+
+            <label for="pricePerUnit">Price per Unit</label>
+            <input type="number" id="pricePerUnit" required>
+
+            <label for="taxRate">Tax Rate (%)</label>
+            <input type="number" id="taxRate" required>
+
+            <button type="button" onclick="generateInvoice()">Generate Invoice</button>
+        </form>
+    </div>
+
+    <div class="invoice-container" id="invoiceContainer" style="display: none;">
+        <h2>Invoice</h2>
+        <div class="invoice">
+            <div class="invoice-header">
+                <div>
+                    <p><strong>Customer Name:</strong> <span id="invoiceCustomerName"></span></p>
+                    <p><strong>Address:</strong> <span id="invoiceCustomerAddress"></span></p>
+                </div>
+            </div>
+
+            <table class="invoice-table">
+                <thead>
+                    <tr>
+                        <th>Description</th>
+                        <th>Quantity</th>
+                        <th>Price per Unit</th>
+                        <th>Tax (%)</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td id="invoiceItemDescription"></td>
+                        <td id="invoiceQuantity"></td>
+                        <td id="invoicePricePerUnit"></td>
+                        <td id="invoiceTaxRate"></td>
+                        <td id="invoiceTotal"></td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="total">
+                <strong>Grand Total: $<span id="grandTotal"></span></strong>
+            </div>
+            <button onclick="downloadInvoice()">Download Invoice</button>
+            <button onclick="window.print()">Print Invoice</button>
+        </div>
+    </div>
+
+    <script>
+        function generateInvoice() {
+            const customerName = document.getElementById('customerName').value;
+            const customerAddress = document.getElementById('customerAddress').value;
+            const itemDescription = document.getElementById('itemDescription').value;
+            const quantity = parseInt(document.getElementById('quantity').value);
+            const pricePerUnit = parseFloat(document.getElementById('pricePerUnit').value);
+            const taxRate = parseFloat(document.getElementById('taxRate').value);
+
+            const total = quantity * pricePerUnit;
+            const tax = (total * taxRate) / 100;
+            const grandTotal = total + tax;
+
+            document.getElementById('invoiceCustomerName').textContent = customerName;
+            document.getElementById('invoiceCustomerAddress').textContent = customerAddress;
+            document.getElementById('invoiceItemDescription').textContent = itemDescription;
+            document.getElementById('invoiceQuantity').textContent = quantity;
+            document.getElementById('invoicePricePerUnit').textContent = '$${pricePerUnit.toFixed(2)}';
+            document.getElementById('invoiceTaxRate').textContent = '${taxRate}%';
+            document.getElementById('invoiceTotal').textContent = '$${total.toFixed(2)}';
+            document.getElementById('grandTotal').textContent = grandTotal.toFixed(2);
+
+            document.getElementById('invoiceContainer').style.display = 'block';
+        }
+
+        function downloadInvoice() {
+            const invoice = document.querySelector('.invoice').innerHTML;
+            const blob = new Blob([invoice], { type: 'text/html' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'invoice.html';
+            link.click();
+        }
+    </script>
+</body>
+</html>
